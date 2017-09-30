@@ -1,0 +1,79 @@
+<!doctype html>
+
+<!-- 
+Using the Periscope Embed API to display data from a dashboard on a webpage. 
+This allows you to view the url(for testing) and to see the dashboard in an iFrame.
+-->
+
+<html>
+<head>
+    
+<script src="rollups/hmac-sha256.js"></script>
+<script src="components/enc-base64-min.js"></script>
+
+</head>
+
+<body>
+    
+    
+<script>
+api_key = 'xxxxxxxxxxxxxxxxxxxxx' // Periscope API key
+
+    //JSON blob that is used to create the embedded URL
+    var name = encodeURIComponent(JSON.stringify({  
+        "dashboard": 177164,    // dashboard number
+        "aggregation": "hourly",
+        "embed": "v2",         // embed version 
+        "border": "off",       // dash border 
+        "data_ts": 1446069112 // refresh rate in integer seconds
+    }));
+        
+
+// Converts to a string
+var encoded_json_blob = name.toString();
+
+// path json blob
+var path = '/api/embedded_dashboard?data=' + encoded_json_blob;
+
+// the hex-encoded SHA256-HMAC of the URL path and the API key
+var hash = CryptoJS.HmacSHA256(path, api_key)       
+var hashInBase64 = hash.toString(CryptoJS.enc.Hex)
+   
+// finished url
+full_url = 'https://www.periscopedata.com' + path + '&signature=' + hashInBase64
+
+// Converts the utl to a string 
+var url = full_url.toString();
+
+
+        
+// function for showing url
+function showUrl(){
+
+    document.getElementById('URL-view').value = url;
+}
+
+</script>    
+    
+
+<p>Click below to see the url for updated dashboard</p>  
+
+ <button id="btnClick" onclick="showUrl()">Click to view the url</button> 
+
+
+<div>
+<textarea id="URL-view" cols="80" rows="10"></textarea>
+</div>
+
+<br/>
+   
+<script>
+    
+    // iframe for viewing the dashboard
+     document.write(" <iframe  id='frame' name='frame' src='" + url + "' width='1000'  height='315'   allowfullscreen></iframe>")
+    
+</script>
+    
+
+</body>
+</html>
